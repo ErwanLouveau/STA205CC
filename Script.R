@@ -16,10 +16,14 @@ data$diabete <- as.factor(data$diabete)
 data$anemie <- as.factor(data$anemie)
 
 # Transformation de creat et fraction en variable binaire (nécessaire ?)
-data$creatF <- as.factor(ifelse(data$creat > 1.5, 1, 0))
+data$insufisanceR <- as.factor(ifelse(data$creat > 1.5, 1, 0))
 data$fractionF <- as.factor(case_when(data$fraction <= 30 ~ 0,
                                      data$fraction >= 45 ~ 2, 
-                                     TRUE ~ 1)) # (2 indicatrices plutôt ?)
+                                     TRUE ~ 1)) 
+
+# Centrage de l'âge 
+data$AgeC <- data$Age - median(data$Age)
+
 str(data)
 summary(data)
 data %>% 
