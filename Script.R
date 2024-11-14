@@ -150,6 +150,10 @@ fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + dia
       data = data, ties = 'breslow')
 summary(fit4) # Fait passé anémie en sign.
 fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)),
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+summary(fit4) # Fait passé anémie en sign.
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
                 Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium, 
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
 summary(fit4) # Sodium perd la sign. , FractionF1 la gagne
@@ -173,6 +177,11 @@ fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + dia
                 Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + sexe*tabac + diabete*Sodium, 
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
 summary(fit4)
+plot(predict(fit4), residuals(fit4,type = "martingale"),
+    xlab = "fitted value", ylab = "Martingale Residuals",
+    main = "Residual Plot", las = 1)
+abline(h=0)
+lines(smooth.spline(predict(fit4),residuals(fit4, type = "martingale")), col = "red")
 
 # Résidus
 fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
@@ -181,7 +190,15 @@ fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + dia
 cox.zph(fit4,transform="identity") # FractionF : 0.045 => 0.054 ; GLOBAL : 0.13 => 0.16
 
 
-
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+cox.zph(fit4,transform="identity")
+plot(predict(fit4), residuals(fit4,type = "martingale"),
+     xlab = "fitted value", ylab = "Martingale Residuals",
+     main = "Residual Plot", las = 1)
+abline(h=0)
+lines(smooth.spline(predict(fit4),residuals(fit4, type = "martingale")), col = "red")
 
 # ======================================================================================================
 # plot(prop1_1[10])
