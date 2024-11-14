@@ -136,6 +136,7 @@ print(prop3)
 
 
 
+# ======================================================================================================
 # plot(prop1_1[10])
 # 
 # fit1_2 <- coxph(Surv(log(temps), dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
