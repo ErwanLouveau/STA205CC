@@ -12,7 +12,7 @@ data$hta <- as.factor(data$hta)
 data$diabete <- as.factor(data$diabete)
 data$anemie <- as.factor(data$anemie)
 
-# Transformation de creat et fraction en variable binaire (nécessaire ?)
+# Transformation de creat et fraction en variable binaire 
 data$insufisanceR <- as.factor(ifelse(data$creat > 1.5, 1, 0))
 data$fractionF <- as.factor(case_when(data$fraction <= 30 ~ 0,
                                       data$fraction >= 45 ~ 2, 
