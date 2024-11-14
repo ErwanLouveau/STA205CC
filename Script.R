@@ -127,12 +127,59 @@ print(prop2)
 # Question à PJ --> pourquoi mettre au log la variable creatk 
 # Si a cause d'un problème d'echelle, pourquoi pas sodium ?
 fit3 <- coxph(Surv(log(temps), dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
-                Sodium + anemie + insufisanceR + creatk + tt(as.numeric(fractionF)), 
+                Sodium + anemie + strata(insufisanceR) + creatk + tt(as.numeric(fractionF)), 
                 data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
 summary(fit3)
 prop3 <- cox.zph(fit3,transform="identity") # IMPOSSIBLE car interaction avec le temps
   # /!\ TROUVER COMMENT VERIFIER L'ADEQUATION AU MODELE QUAND ON A UN TERME D'INTERACTION AVEC LE TEMPS
 print(prop3)
+
+
+
+# INTERACTIONS AUTRES SIGNIFICATIVES
+fit4 <- coxph(Surv(log(temps), dc == 1) ~ sexe + tabac + sexe*tabac, 
+              data = data, ties = 'breslow')
+summary(fit4) 
+fit4 <- coxph(Surv(log(temps), dc == 1) ~ diabete + Sodium + diabete*Sodium, 
+              data = data, ties = 'breslow')
+summary(fit4) 
+
+# diabete*sodium
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+        Sodium + anemie + creatk + strata(insufisanceR) + diabete*Sodium, 
+      data = data, ties = 'breslow')
+summary(fit4) # Fait passé anémie en sign.
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+summary(fit4) # Sodium perd la sign. , FractionF1 la gagne
+
+# sexe*tabac
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + sexe*tabac, 
+              data = data, ties = 'breslow')
+summary(fit4) # Change rien 
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + sexe*tabac, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+summary(fit4)
+
+# Les deux inéractions
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + sexe*tabac + diabete*Sodium, 
+              data = data, ties = 'breslow')
+summary(fit4)
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + sexe*tabac + diabete*Sodium, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+summary(fit4)
+
+# Résidus
+fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + diabete*Sodium, 
+              data = data, ties = 'breslow')
+cox.zph(fit4,transform="identity") # FractionF : 0.045 => 0.054 ; GLOBAL : 0.13 => 0.16
+
 
 
 
