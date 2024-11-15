@@ -52,6 +52,7 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
          insufisanceR = if_else(insufisanceR==0,"Non","Oui")) %>% 
   mutate(fractionF = factor(fractionF, levels = c("<30", "[30;45[", ">=45"))) %>% 
   tbl_summary(by = dc,
+              type = list(c(Age,fraction,creat,Sodium, creatk,temps) ~ "continuous2"),
               statistic = list(all_continuous2() ~ c("{mean} ({sd})"),
                                all_categorical() ~ c("{n} ({p}%)")),
               # missing = "no",
@@ -70,7 +71,7 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
                            temps~"Temps de suivi (en jour)")) %>% 
   italicize_labels() %>% 
   add_p(list(all_continuous2()~"t.test",
-             all_categorical() ~ "fisher.test")) 
+             all_categorical()~"fisher.test"))
 # 
 # %>% 
 #   modify_footnote(everything() ~ NA)
