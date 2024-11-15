@@ -34,11 +34,11 @@ data$AgeC <- data$Age - median(data$Age)
 ### TABLEAU 1 - Description en fonction de deces
 
 theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
-
+# ,
+# temps
 data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
                 fractionF, fraction, insufisanceR, creat, anemie, 
-                Sodium, creatk,
-                temps) %>% 
+                Sodium, creatk) %>% 
   mutate(dc = if_else(dc==0,"Non","Oui"),
          sexe = if_else(sexe==1,"Hommes","Femmes"),
          tabac = if_else(tabac==0,"Non fumeur","Fumeur"),
@@ -52,7 +52,7 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
          insufisanceR = if_else(insufisanceR==0,"Non","Oui")) %>% 
   mutate(fractionF = factor(fractionF, levels = c("<30", "[30;45[", ">=45"))) %>% 
   tbl_summary(by = dc,
-              type = list(c(Age,fraction,creat,Sodium, creatk,temps) ~ "continuous2"),
+              type = list(c(Age,fraction,creat,Sodium, creatk) ~ "continuous2"),
               statistic = list(all_continuous2() ~ c("{mean} ({sd})"),
                                all_categorical() ~ c("{n} ({p}%)")),
               # missing = "no",
@@ -67,8 +67,8 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
                            insufisanceR~"Insufisance rénale",
                            creat~"Clérence rénale de la créatinine (en mL/s)",
                            anemie~"Présence d'anémie",
-                           creatk~"Créatine kinase (en UI/L)",
-                           temps~"Temps de suivi (en jour)")) %>% 
+                           creatk~"Créatine kinase (en UI/L)"))
+                           # temps~"Temps de suivi (en jour)")) %>% 
   italicize_labels() %>% 
   add_p(list(all_continuous2()~"t.test",
              all_categorical()~"fisher.test"))
