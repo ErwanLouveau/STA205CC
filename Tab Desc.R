@@ -67,7 +67,7 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
                            insufisanceR~"Insufisance rénale",
                            creat~"Clérence rénale de la créatinine (en mL/s)",
                            anemie~"Présence d'anémie",
-                           creatk~"Créatine kénase (en UI/L)",
+                           creatk~"Créatine kinase (en UI/L)",
                            temps~"Temps de suivi (en jour)")) %>% 
   italicize_labels() %>% 
   add_p(list(all_continuous2()~"t.test",
