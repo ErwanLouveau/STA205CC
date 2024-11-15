@@ -71,7 +71,9 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
                            # temps~"Temps de suivi (en jour)"))
   italicize_labels() %>% 
   add_p(list(all_continuous2()~"t.test",
-             all_categorical()~"fisher.test"))
+             all_categorical()~"fisher.test")) %>% 
+  as_gt %>% 
+  as_latex()
 # 
 # %>% 
 #   modify_footnote(everything() ~ NA)
