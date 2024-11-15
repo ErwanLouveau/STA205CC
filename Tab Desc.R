@@ -71,9 +71,64 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
                            # temps~"Temps de suivi (en jour)"))
   italicize_labels() %>% 
   add_p(list(all_continuous2()~"t.test",
-             all_categorical()~"fisher.test")) %>% 
-  as_gt %>% 
-  as_latex()
+             all_categorical()~"chisq.test"))
+# %>% 
+  # as_gt %>% 
+  # as_latex()
 # 
 # %>% 
 #   modify_footnote(everything() ~ NA)
+
+data %>% 
+  select(-ID, -AgeC) %>% 
+  select(dc, Age, sexe, tabac, hta, diabete, fractionF, fraction, insufisanceR, creat, anemie, Sodium, creatk) %>% 
+  mutate(
+    dc = if_else(dc == 0, "Non", "Oui"),
+    sexe = if_else(sexe == 1, "Hommes", "Femmes"),
+    tabac = if_else(tabac == 0, "Non fumeur", "Fumeur"),
+    hta = if_else(hta == 0, "Non", "Oui"),
+    diabete = if_else(diabete == 0, "Non", "Oui"),
+    anemie = if_else(anemie == 0, "Non", "Oui"),
+    fractionF = case_when(
+      fractionF == 0 ~ "<30",
+      fractionF == 1 ~ "[30;45[",
+      fractionF == 2 ~ ">=45",
+      TRUE ~ NA
+    ),
+    insufisanceR = if_else(insufisanceR == 0, "Non", "Oui")
+  ) %>% 
+  mutate(fractionF = factor(fractionF, levels = c("<30", "[30;45[", ">=45"))) %>% 
+  tbl_strata(
+    strata = insufisanceR, # La variable de stratification
+    .tbl_fun = ~ .x %>%
+      tbl_summary(
+        by = dc,
+        type = list(c(Age, fraction, creat, Sodium, creatk) ~ "continuous2"),
+        statistic = list(
+          all_continuous2() ~ c("{mean} ({sd})"),
+          all_categorical() ~ c("{n} ({p}%)")
+        ),
+        digits = list(
+          all_continuous2() ~ c(1, 1),
+          all_categorical() ~ c(0, 1)
+        ),
+        label = list(
+          Sodium ~ "Concentration de sodium dans le plasma (en mmol/L)",
+          tabac ~ "Statut tabagique",
+          hta ~ "Présence d'hypertension",
+          diabete ~ "Diabète",
+          fractionF ~ "Catégorie de Fraction d'éjection (en %)",
+          fraction ~ "Fraction d'éjection (en %)",
+          creat ~ "Clérance rénale de la créatinine (en mL/s)",
+          anemie ~ "Présence d'anémie",
+          creatk ~ "Créatine kinase (en UI/L)"
+        )
+      ) %>% 
+      italicize_labels() %>% 
+      add_p(list(
+        all_continuous2() ~ "t.test",
+        all_categorical() ~ "fisher.test"
+      ))
+  ) %>%
+  as_gt %>%
+  as_latex()
