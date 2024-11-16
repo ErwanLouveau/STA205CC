@@ -112,7 +112,9 @@ data %>% select(-ID, -AgeC, -dc) %>% select(Age, sexe, tabac, hta, diabete,
   # temps~"Temps de suivi (en jour)"))
   italicize_labels() %>% 
   add_p(list(all_continuous2()~"t.test",
-             all_categorical()~"chisq.test"))
+             all_categorical()~"chisq.test")) %>% 
+  as_gt() %>% 
+  gt::as_latex()
 
 data %>% 
   select(-ID, -AgeC) %>% 
