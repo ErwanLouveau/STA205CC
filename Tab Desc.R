@@ -80,6 +80,43 @@ data %>% select(-ID, -AgeC) %>% select(dc, Age, sexe, tabac, hta, diabete,
 # %>% 
 #   modify_footnote(everything() ~ NA)
 
+data %>% select(-ID, -AgeC, -dc) %>% select(Age, sexe, tabac, hta, diabete,
+                                       fractionF, fraction, insufisanceR, creat, anemie, 
+                                       Sodium, creatk) %>% 
+  mutate(sexe = if_else(sexe==1,"Hommes","Femmes"),
+         tabac = if_else(tabac==0,"Non fumeur","Fumeur"),
+         hta = if_else(hta==0,"Non","Oui"),
+         diabete = if_else(diabete==0,"Non","Oui"),
+         anemie = if_else(anemie==0,"Non","Oui"),
+         fractionF = case_when(fractionF==0~"<30",
+                               fractionF==1~"[30;45[",
+                               fractionF==2~">=45",
+                               TRUE ~ NA),
+         insufisanceR = if_else(insufisanceR==0,"Non","Oui")) %>% 
+  mutate(fractionF = factor(fractionF, levels = c("<30", "[30;45[", ">=45"))) %>% 
+  tbl_summary(by = insufisanceR,
+              type = list(c(Age,fraction,creat,Sodium, creatk) ~ "continuous2"),
+              statistic = list(all_continuous2() ~ c("{mean} ({sd})"),
+                               all_categorical() ~ c("{n} ({p}%)")),
+              # missing = "no",
+              digits = list(all_continuous2()~c(1,1),
+                            all_categorical()~c(0,1)),
+              label = list(Sodium~"Concentration de sodium dans le plasma (en mmol/L)",
+                           tabac~"Statut tabagique",
+                           hta~"Présence d'hypertension",
+                           diabete~"Diabète",
+                           fractionF~"Catégorie de Fraction d'éjection (en %)",
+                           fraction~"Fraction d'éjection (en %)",
+                           creat~"Clérence rénale de la créatinine (en mL/s)",
+                           anemie~"Présence d'anémie",
+                           creatk~"Créatine kinase (en UI/L)")) %>%
+  # temps~"Temps de suivi (en jour)"))
+  italicize_labels() %>% 
+  add_p(list(all_continuous2()~"t.test",
+             all_categorical()~"chisq.test")) %>% 
+  as_gt() %>% 
+  gt::as_latex()
+
 data %>% 
   select(-ID, -AgeC) %>% 
   select(dc, Age, sexe, tabac, hta, diabete, fractionF, fraction, insufisanceR, creat, anemie, Sodium, creatk) %>% 
