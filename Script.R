@@ -190,15 +190,34 @@ fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + dia
 cox.zph(fit4,transform="identity") # FractionF : 0.045 => 0.054 ; GLOBAL : 0.13 => 0.16
 
 
-fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+### Modèle final
+fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
                 Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
-cox.zph(fit4,transform="identity")
-plot(predict(fit4), residuals(fit4,type = "martingale"),
+summary(fitf)
+
+fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + diabete*Sodium + tabac*sexe, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+propf <- cox.zph(fitf,transform="identity")
+plot(propf[1])
+
+
+plot(predict(fitf), residuals(fitf,type = "martingale"),
      xlab = "fitted value", ylab = "Martingale Residuals",
      main = "Residual Plot", las = 1)
-abline(h=0)
-lines(smooth.spline(predict(fit4),residuals(fit4, type = "martingale")), col = "red")
+abline(h=0, col ="red")
+# lines(smooth.spline(predict(fitf),residuals(fitf, type = "martingale")), col = "red")
+
+### TABLEAU REGRESSION
+tbl <- tbl_regression(fitf)
+tbl %>% as_gt() %>% gt::as_latex()
+
+
+
 
 # ======================================================================================================
 # plot(prop1_1[10])
