@@ -189,9 +189,9 @@ fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + dia
               data = data, ties = 'breslow')
 cox.zph(fit4,transform="identity") # FractionF : 0.045 => 0.054 ; GLOBAL : 0.13 => 0.16
 
-
+data$sodiumC <- data$Sodium-median(data$Sodium)
 fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
-                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
+                sodiumC + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*sodiumC + tabac*sexe, 
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
 cox.zph(fit4,transform="identity")
 plot(predict(fit4), residuals(fit4,type = "martingale"),
