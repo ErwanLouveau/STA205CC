@@ -1,6 +1,7 @@
 library(survival)
 library(dplyr)
 library(gtsummary)
+library(gt)
 
 # script_principal.R
 
