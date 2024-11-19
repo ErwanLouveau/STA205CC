@@ -78,6 +78,9 @@ summary(fit)
 fit1 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
                 Sodium + anemie + insufisanceR + creatk, 
               data = data, ties = 'breslow')
+plot(predict(fit1), residuals(fit1,type = "martingale"),
+     xlab = "fitted value", ylab = "Martingale Residuals", las = 1)
+abline(h=0, col="red")
   # même modèle simple avec fractionF (fraction d'éjection) en exposition principale mais avec
   # creatk mis au log. Raison : L'unité de mesure de la créatine kénase est d'un ordre bien plus
   # important que les autres variables
@@ -191,21 +194,21 @@ fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + dia
               data = data, ties = 'breslow')
 cox.zph(fit4,transform="identity") # FractionF : 0.045 => 0.054 ; GLOBAL : 0.13 => 0.16
 
-<<<<<<< HEAD
 
 ### Modèle final
-fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
-                Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
-=======
 fit4 <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
                 sodiumC + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*sodiumC + tabac*sexe, 
->>>>>>> 96bcc2149498054b08e8fa0bced78a92781f66c2
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+
 summary(fitf)
 
 fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
                 Sodium + anemie + creatk + strata(insufisanceR) + diabete*Sodium + tabac*sexe, 
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
+                Sodium + anemie + creatk + tt(as.numeric(fractionF)), 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+
 fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + 
                 Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
               data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
@@ -214,8 +217,7 @@ plot(propf[1])
 
 
 plot(predict(fitf), residuals(fitf,type = "martingale"),
-     xlab = "fitted value", ylab = "Martingale Residuals",
-     main = "Residual Plot", las = 1)
+     xlab = "fitted value", ylab = "Martingale Residuals", las = 1)
 abline(h=0, col ="red")
 # lines(smooth.spline(predict(fitf),residuals(fitf, type = "martingale")), col = "red")
 

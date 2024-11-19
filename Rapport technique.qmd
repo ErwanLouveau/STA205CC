@@ -1,0 +1,86 @@
+---
+title: "Rapport technique - CC STA205 - Erwan Louveau, Louis Cazade, Alarig Vigneras"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| echo: false
+library(survival)
+library(survminer)
+library(dplyr)
+
+source("C:/Users/erwan/Desktop/M2 Biostat/STA205/Projet CC/ProjetCC/setup.R")
+
+# Transformation des premières variables en facteurs
+data$dc <- as.factor(data$dc)
+data$sexe <- as.factor(data$sexe)
+data$tabac <- as.factor(data$tabac)
+data$hta <- as.factor(data$hta)
+data$diabete <- as.factor(data$diabete)
+data$anemie <- as.factor(data$anemie)
+
+# Transformation de creat et fraction en variable binaire 
+data$insufisanceR <- as.factor(ifelse(data$creat > 1.5, 1, 0))
+data$fractionF <- as.factor(case_when(data$fraction <= 30 ~ 0,
+                                      data$fraction >= 45 ~ 2, 
+                                      TRUE ~ 1)) 
+
+# Centrage de l'âge 
+data$AgeC <- data$Age - median(data$Age)
+```
+
+## Estimation de la fonction de survie - Kaplan-Meier
+
+```{r}
+fit <- survfit(Surv(temps,dc==1) ~ fractionF, data = data)
+ggsurvplot(
+  fit, 
+  data = data,
+  conf.int = TRUE,
+  pval = FALSE,
+  risk.table = FALSE,
+  ggtheme = theme_minimal()
+)
+```
+
+## Modèle sans interaction ni stratification
+
+```{r}
+fit <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + Sodium + anemie + insufisanceR + creatk, 
+             data = data, ties = 'breslow')
+summary(fit)
+```
+
+## Modèle avec interaction et stratification
+
+```{r}
+fitf <- coxph(Surv(temps, dc == 1) ~ fractionF + sexe + AgeC + tabac + hta + diabete + Sodium + anemie + creatk + strata(insufisanceR) + tt(as.numeric(fractionF)) + diabete*Sodium + tabac*sexe, 
+              data = data, ties = 'breslow', tt=function(x, t, ...){x * t})
+summary(fitf)
+```
+
+## Résidus de Schoenfeld
+
+```{r}
+prop1 <- cox.zph(fit,transform="identity")
+print(prop1)
+plot(prop1[1]) # résidus de schoenfeld de la variable fraction d'éjection
+plot(prop1[9]) # résidus de schoenfeld de la variable insuffisance rénale
+```
+
+## Résidus de martingale du modèle sans interaction ni stratification
+
+```{r}
+plot(predict(fit), residuals(fit,type = "martingale"),
+     xlab = "fitted value", ylab = "Martingale Residuals", las = 1)
+abline(h=0, col="red")
+```
+
+## Résidus de martingale du modèle avec interaction et stratification
+
+```{r}
+plot(predict(fitf), residuals(fitf,type = "martingale"),
+     xlab = "fitted value", ylab = "Martingale Residuals", las = 1)
+abline(h=0, col ="red")
+```
